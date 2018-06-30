@@ -5,7 +5,10 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.rest.api.data.CarRepository;
 import com.rest.api.exception.CarNotFoundException;
@@ -13,6 +16,7 @@ import com.rest.api.exception.EntityNotFoundException;
 import com.rest.api.model.Car;
 
 @Service
+@Validated
 public class CarServiceImpl implements CarService {
 
 	@Autowired
@@ -30,6 +34,10 @@ public class CarServiceImpl implements CarService {
 		return carRepository.findAll();
 	}
 
+	public Page<Car> findAllPaginated(int page, int size) {
+		return carRepository.findAll(PageRequest.of(page, size));
+	}
+	
 	public Car add(@Valid Car entity) {
 		return carRepository.save(entity);
 	}

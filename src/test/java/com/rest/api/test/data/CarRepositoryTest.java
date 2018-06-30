@@ -1,4 +1,4 @@
-package com.rest.api.test.service;
+package com.rest.api.test.data;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -14,28 +14,22 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.rest.api.data.CarRepository;
-import com.rest.api.exception.CarNotFoundException;
 import com.rest.api.model.Car;
-import com.rest.api.service.CarService;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class CarServiceTest {
+@DataJpaTest
+public class CarRepositoryTest {
 
 	@Autowired
-	private CarService carService;
-	
-	//@MockBean
-	//private CarRepository carRepository;
+	private CarRepository carRepository;
 
 	@Test
 	public void getCar() throws Exception {
-		Car car = carService.findById(3L);
+		Car car = carRepository.findById(3L).get();
 		assertThat(3L, equalTo(car.getId()));
 		assertThat("Mercedes", equalTo(car.getBrand()));
 		assertThat("A 220d", equalTo(car.getModel()));
@@ -43,9 +37,9 @@ public class CarServiceTest {
 		assertThat(new BigDecimal("25000.00"), equalTo(car.getPrice()));
 	}
 	
-	@Test(expected = CarNotFoundException.class)
-	public void getCarNotFound() throws Exception {
-		carService.findById(99L);
+	@Test
+	public void getCarNotFound() {
+		carRepository.findById(99L);
 	}
 	
 	@Test
@@ -56,10 +50,10 @@ public class CarServiceTest {
 		car.setVersion(1);
 		car.setPrice(new BigDecimal("1000.00"));
 
-		carService.add(car);
+		carRepository.save(car);
 		assertThat(car.getId(), notNullValue());
 
-		Car ins = carService.findById(car.getId());
+		Car ins = carRepository.findById(car.getId()).get();
 		assertThat(car.getBrand(), equalTo(ins.getBrand()));
 		assertThat(car.getModel(), equalTo(ins.getModel()));
 		assertThat(car.getVersion(), equalTo(ins.getVersion()));
@@ -72,50 +66,39 @@ public class CarServiceTest {
 
 	@Test
 	public void updateCar() throws Exception {
-		Car car = carService.findById(2L);
+		Car car = carRepository.findById(2L).get();
 		car.setBrand("Brand");
 		car.setModel("Model");
 		car.setVersion(0);
 		car.setPrice(new BigDecimal("1000.00"));
+		
+		Thread.sleep(100);
+		carRepository.save(car);
 
-		carService.update(2L, car);
-
-		Car upd = carService.findById(2L);
+		Car upd = carRepository.findById(2L).get();
 		assertThat(car.getBrand(), equalTo(upd.getBrand()));
 		assertThat(car.getModel(), equalTo(upd.getModel()));
 		assertThat(car.getVersion(), equalTo(upd.getVersion()));
 		assertThat(car.getPrice(), equalTo(upd.getPrice()));
 		assertThat(car.getInsertDate(), is(notNullValue()));
 		assertThat(car.getUpdateDate(), is(notNullValue()));
-		assertThat(car.getUpdateDate(), ZonedDateTimeMatchers.after(car.getInsertDate()));
-		assertThat(car.getUpdateDate(), ZonedDateTimeMatchers.before(ZonedDateTime.now()));
-	}
-	
-	@Test(expected = CarNotFoundException.class)
-	public void updateCarNotFound() throws Exception {
-		Car car = new Car();
-		car.setId(99);
-		car.setBrand("Brand");
-		car.setModel("Model");
-		car.setVersion(0);
-		car.setPrice(new BigDecimal("1000.00"));
-
-		carService.update(car.getId(), car);
+		//assertThat(car.getUpdateDate(), ZonedDateTimeMatchers.after(car.getInsertDate()));
+		//assertThat(car.getUpdateDate(), ZonedDateTimeMatchers.before(ZonedDateTime.now()));
 	}
 
 	@Test
 	public void deleteCar() {
-		carService.deleteById(2L);
+		carRepository.deleteById(2L);
 	}
 	
-	@Test
+	@Test(expected = EmptyResultDataAccessException.class)
 	public void deleteCarNotFound() {
-		carService.deleteById(99L);
+		carRepository.deleteById(99L);
 	}
 
 	@Test
 	public void listCars() {
-		Iterable<Car> carList = carService.findAll();
+		Iterable<Car> carList = carRepository.findAll();
 		//assertThat(3, equalTo(carList.size()));
 
 		for (Car c : carList) {

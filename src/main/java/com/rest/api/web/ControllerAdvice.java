@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.rest.api.exception.CarNotFoundException;
+import com.rest.api.exception.ResourceNotFoundException;
 import com.rest.api.model.error.Error;
 import com.rest.api.model.error.FieldError;
 import com.rest.api.model.error.ValidationError;
@@ -29,6 +30,12 @@ public class ControllerAdvice {
 	
 	@Autowired
 	private MessageSource messageSource;
+	
+	@ExceptionHandler(ResourceNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public void handleResourceNotFoundException() {
+		;
+	}
 	
 	@ResponseBody
 	@ExceptionHandler(CarNotFoundException.class)

@@ -2,7 +2,11 @@ package com.rest.api.web;
 
 import java.net.URI;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,12 +16,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.rest.api.exception.EntityNotFoundException;
+import com.rest.api.exception.ResourceNotFoundException;
 import com.rest.api.model.Car;
 import com.rest.api.service.CarService;
+import com.rest.api.web.event.PaginatedResultsRetrievedEvent;
 
 @RestController
 @RequestMapping(ApiRest.API_PATH + "/cars")
@@ -25,10 +33,28 @@ public class CarRest extends ApiRest {
 
 	@Autowired
 	private CarService carService;
+	
+	@Autowired
+    private ApplicationEventPublisher eventPublisher;
 
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public Iterable<Car> listCars() {
 		return carService.findAll();
+	}
+	
+	@GetMapping(params = {"page", "size"}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public Iterable<Car> listCars(@RequestParam("page") int page, @RequestParam("size") int size,
+			UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+		Page<Car> resultPage = carService.findAllPaginated(page, size);
+		
+		if(page > resultPage.getTotalPages()) {
+			throw new ResourceNotFoundException();
+		}
+		
+		eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<Car>
+		    (this, ServletUriComponentsBuilder.fromCurrentRequest(), response, resultPage.getTotalElements(), page, resultPage.getTotalPages(), size));
+		   
+		return resultPage.getContent();
 	}
 
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)

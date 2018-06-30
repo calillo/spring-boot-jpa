@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
@@ -18,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Car {
 	
 	@Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
 	
 	@NotNull
