@@ -3,12 +3,15 @@ package com.rest.api.web;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +32,7 @@ import com.rest.api.web.event.PaginatedResultsRetrievedEvent;
 
 @RestController
 @RequestMapping(ApiRest.API_PATH + "/cars")
+@Validated
 public class CarRest extends ApiRest {
 
 	@Autowired
@@ -43,9 +47,10 @@ public class CarRest extends ApiRest {
 	}
 	
 	@GetMapping(params = {"page", "size"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public Iterable<Car> listCars(@RequestParam("page") int page, @RequestParam("size") int size,
+	public Iterable<Car> listCars(@Min(1) @RequestParam("page") int page, @Max(50) @RequestParam("size") int size,
 			UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-		Page<Car> resultPage = carService.findAllPaginated(page, size);
+		
+		Page<Car> resultPage = carService.findAllPaginated(page-1, size);
 		
 		if(page > resultPage.getTotalPages()) {
 			throw new ResourceNotFoundException();

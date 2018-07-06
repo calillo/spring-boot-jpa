@@ -42,9 +42,10 @@ class PaginatedResultsRetrievedEventDiscoverabilityListener implements Applicati
             linkHeader.append(createLinkHeader(uriForLastPage, "last"));
         }
         
-        response.addHeader("X-Pagination-Count", "" + totalCount);
-        response.addHeader("X-Pagination-Page", "" + page);
-        response.addHeader("X-Pagination-Limit", "" + pageSize);
+        response.addHeader("Pagination-Total-Count", "" + totalCount);
+        response.addHeader("Pagination-Page", "" + page);
+        response.addHeader("Pagination-Page-Count", "" + totalPages);
+        response.addHeader("Pagination-Limit", "" + pageSize);
         
         response.addHeader("Link", linkHeader.toString());
     }
@@ -58,7 +59,7 @@ class PaginatedResultsRetrievedEventDiscoverabilityListener implements Applicati
     }
 
     String constructFirstPageUri(final UriComponentsBuilder uriBuilder, final int size) {
-        return uriBuilder.replaceQueryParam("page", 0).replaceQueryParam("size", size).build().encode().toUriString();
+        return uriBuilder.replaceQueryParam("page", 1).replaceQueryParam("size", size).build().encode().toUriString();
     }
 
     String constructLastPageUri(final UriComponentsBuilder uriBuilder, final int totalPages, final int size) {
@@ -66,11 +67,11 @@ class PaginatedResultsRetrievedEventDiscoverabilityListener implements Applicati
     }
 
     boolean hasNextPage(final int page, final int totalPages) {
-        return page < totalPages - 1;
+        return page < totalPages;
     }
 
     boolean hasPreviousPage(final int page) {
-        return page > 0;
+        return page > 1;
     }
 
     boolean hasFirstPage(final int page) {
