@@ -6,7 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -34,8 +34,8 @@ public class CarServiceImpl implements CarService {
 		return carRepository.findAll();
 	}
 
-	public Page<Car> findAllPaginated(int page, int size) {
-		return carRepository.findAll(PageRequest.of(page, size));
+	public Page<Car> findAllPaginated(Pageable pageable) {
+		return carRepository.findAll(pageable);
 	}
 	
 	public Car add(@Valid Car entity) {

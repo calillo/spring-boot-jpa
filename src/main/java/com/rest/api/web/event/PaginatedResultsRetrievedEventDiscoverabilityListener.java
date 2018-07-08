@@ -59,19 +59,19 @@ class PaginatedResultsRetrievedEventDiscoverabilityListener implements Applicati
     }
 
     String constructFirstPageUri(final UriComponentsBuilder uriBuilder, final int size) {
-        return uriBuilder.replaceQueryParam("page", 1).replaceQueryParam("size", size).build().encode().toUriString();
+        return uriBuilder.replaceQueryParam("page", 0).replaceQueryParam("size", size).build().encode().toUriString();
     }
 
     String constructLastPageUri(final UriComponentsBuilder uriBuilder, final int totalPages, final int size) {
-        return uriBuilder.replaceQueryParam("page", totalPages).replaceQueryParam("size", size).build().encode().toUriString();
+        return uriBuilder.replaceQueryParam("page", totalPages -1).replaceQueryParam("size", size).build().encode().toUriString();
     }
 
     boolean hasNextPage(final int page, final int totalPages) {
-        return page < totalPages;
+        return page < totalPages - 1;
     }
 
     boolean hasPreviousPage(final int page) {
-        return page > 1;
+        return page > 0;
     }
 
     boolean hasFirstPage(final int page) {

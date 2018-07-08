@@ -3,12 +3,11 @@ package com.rest.api.web;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -41,23 +39,23 @@ public class CarRest extends ApiRest {
 	@Autowired
     private ApplicationEventPublisher eventPublisher;
 
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public Iterable<Car> listCars() {
-		return carService.findAll();
-	}
+	//@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	//public Iterable<Car> listCars() {
+	//	return carService.findAll();
+	//}
 	
-	@GetMapping(params = {"page", "size"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public Iterable<Car> listCars(@Min(1) @RequestParam("page") int page, @Max(50) @RequestParam("size") int size,
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	public Iterable<Car> listCars(Pageable  pageable,
 			UriComponentsBuilder uriBuilder, HttpServletResponse response) {
 		
-		Page<Car> resultPage = carService.findAllPaginated(page-1, size);
+		Page<Car> resultPage = carService.findAllPaginated(pageable);
 		
-		if(page > resultPage.getTotalPages()) {
+		if(pageable.getPageNumber() > resultPage.getTotalPages() - 1) {
 			throw new ResourceNotFoundException();
 		}
 		
 		eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<Car>
-		    (this, ServletUriComponentsBuilder.fromCurrentRequest(), response, resultPage.getTotalElements(), page, resultPage.getTotalPages(), size));
+		    (this, ServletUriComponentsBuilder.fromCurrentRequest(), response, resultPage.getTotalElements(), pageable.getPageNumber(), resultPage.getTotalPages(), pageable.getPageSize()));
 		   
 		return resultPage.getContent();
 	}
