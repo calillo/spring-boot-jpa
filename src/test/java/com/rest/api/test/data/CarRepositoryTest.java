@@ -3,7 +3,6 @@ package com.rest.api.test.data;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 
@@ -12,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.rest.api.data.CarRepository;
@@ -23,7 +23,7 @@ public class CarRepositoryTest {
 
 	@Autowired
 	private CarRepository carRepository;
-
+	
 	@Test
 	public void getCar() throws Exception {
 		Car car = carRepository.findById(3L).get();
@@ -115,6 +115,30 @@ public class CarRepositoryTest {
 			}
 		}
 
+	}
+	
+	@Test
+	public void findByVersion() {
+		Iterable<Car> carList = carRepository.findByVersion(0, PageRequest.of(0, 2));
+		for (Car c : carList) {
+			assertThat(0, equalTo(c.getVersion()));
+		}
+	}
+	
+	@Test
+	public void findByBrand() {
+		Iterable<Car> carList = carRepository.findByBrand("Fiat", PageRequest.of(0, 2));
+		for (Car c : carList) {
+			assertThat("Fiat", equalTo(c.getBrand()));
+		}
+	}
+	
+	@Test
+	public void findByModel() {
+		Iterable<Car> carList = carRepository.findByModel("Polo", PageRequest.of(0, 2));
+		for (Car c : carList) {
+			assertThat("Polo", equalTo(c.getModel()));
+		}
 	}
 
 }

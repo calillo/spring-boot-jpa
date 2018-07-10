@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.querydsl.core.types.Predicate;
 import com.rest.api.exception.EntityNotFoundException;
 import com.rest.api.exception.ResourceNotFoundException;
 import com.rest.api.model.Car;
@@ -45,10 +47,10 @@ public class CarRest extends ApiRest {
 	//}
 	
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public Iterable<Car> listCars(Pageable  pageable,
+	public Iterable<Car> listCars(@QuerydslPredicate(root = Car.class) Predicate predicate, Pageable  pageable,
 			UriComponentsBuilder uriBuilder, HttpServletResponse response) {
 		
-		Page<Car> resultPage = carService.findAllPaginated(pageable);
+		Page<Car> resultPage = carService.findAllPaginated(predicate, pageable);
 		
 		if(pageable.getPageNumber() > resultPage.getTotalPages() - 1) {
 			throw new ResourceNotFoundException();

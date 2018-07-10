@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import com.querydsl.core.types.Predicate;
 import com.rest.api.data.CarRepository;
 import com.rest.api.exception.CarNotFoundException;
 import com.rest.api.exception.EntityNotFoundException;
@@ -36,8 +37,8 @@ public class CarServiceImpl implements CarService {
 		return carRepository.findAll();
 	}
 
-	public Page<Car> findAllPaginated(Pageable pageable) {
-		return carRepository.findAll(pageable);
+	public Page<Car> findAllPaginated(Predicate predicate, Pageable pageable) {
+		return carRepository.findAll(predicate, pageable);
 	}
 	
 	public Car add(@Valid Car entity) {
