@@ -1,10 +1,12 @@
 package com.rest.api.service;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,8 @@ public class CarServiceImpl implements CarService {
 	}
 	
 	public Car add(@Valid Car entity) {
+		entity.setInsertDate(ZonedDateTime.now());
+		entity.setUpdateDate(ZonedDateTime.now());
 		return carRepository.save(entity);
 	}
 
@@ -46,17 +50,26 @@ public class CarServiceImpl implements CarService {
 		Optional<Car> optCar = carRepository.findById(id);
 		if(optCar.isPresent()) {
 			entity.setId(id);
+			entity.setUpdateDate(ZonedDateTime.now());
 			carRepository.save(entity);
 		} else
 			throw new CarNotFoundException();		
 	}
 
-	public void deleteById(Long id) {
-		carRepository.deleteById(id);
+	public void deleteById(Long id) throws EntityNotFoundException {
+		try {
+			carRepository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			throw new CarNotFoundException();
+		}
 	}
 
-	public void delete(Car entity) {
-		carRepository.delete(entity);
+	public void delete(Car entity) throws EntityNotFoundException {		
+		try {
+			carRepository.delete(entity);
+		} catch (EmptyResultDataAccessException e) {
+			throw new CarNotFoundException();
+		}
 	}
 
 }

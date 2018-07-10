@@ -66,12 +66,12 @@ public class FieldServiceTest {
 	}
 
 	@Test
-	public void deleteField() {
+	public void deleteField() throws Exception {
 		fieldService.deleteById(1L);
 	}
 	
 	@Test
-	public void deleteFieldNotFound() {
+	public void deleteFieldNotFound() throws Exception{
 		fieldService.deleteById(99L);
 	}
 

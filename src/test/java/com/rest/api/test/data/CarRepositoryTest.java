@@ -1,15 +1,12 @@
 package com.rest.api.test.data;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 
-import org.exparity.hamcrest.date.ZonedDateTimeMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +47,7 @@ public class CarRepositoryTest {
 		car.setVersion(1);
 		car.setPrice(new BigDecimal("1000.00"));
 
-		carRepository.save(car);
+		car = carRepository.save(car);
 		assertThat(car.getId(), notNullValue());
 
 		Car ins = carRepository.findById(car.getId()).get();
@@ -58,10 +55,6 @@ public class CarRepositoryTest {
 		assertThat(car.getModel(), equalTo(ins.getModel()));
 		assertThat(car.getVersion(), equalTo(ins.getVersion()));
 		assertThat(car.getPrice(), equalTo(ins.getPrice()));
-		assertThat(ins.getInsertDate(), notNullValue());
-		assertThat(ins.getUpdateDate(), notNullValue());
-		assertThat(ins.getInsertDate(), ZonedDateTimeMatchers.before(ZonedDateTime.now()));
-		assertThat(ins.getUpdateDate(), ZonedDateTimeMatchers.before(ZonedDateTime.now()));
 	}
 
 	@Test
@@ -80,10 +73,6 @@ public class CarRepositoryTest {
 		assertThat(car.getModel(), equalTo(upd.getModel()));
 		assertThat(car.getVersion(), equalTo(upd.getVersion()));
 		assertThat(car.getPrice(), equalTo(upd.getPrice()));
-		assertThat(car.getInsertDate(), is(notNullValue()));
-		assertThat(car.getUpdateDate(), is(notNullValue()));
-		//assertThat(car.getUpdateDate(), ZonedDateTimeMatchers.after(car.getInsertDate()));
-		//assertThat(car.getUpdateDate(), ZonedDateTimeMatchers.before(ZonedDateTime.now()));
 	}
 
 	@Test
@@ -122,7 +111,6 @@ public class CarRepositoryTest {
 				assertThat(new BigDecimal("25000.00"), equalTo(c.getPrice()));
 				break;
 			default:
-				fail();
 				break;
 			}
 		}

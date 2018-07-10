@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -16,7 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Car {
 	
 	@Id
-//    @GeneratedValue(strategy=GenerationType.AUTO)
+	@SequenceGenerator(name = "carIdSeq", sequenceName = "CAR_ID_SEQ")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "carIdSeq")
 	private long id;
 	
 	@NotNull

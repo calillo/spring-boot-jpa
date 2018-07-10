@@ -16,6 +16,6 @@ public interface CrudService<T, ID extends Serializable> {
 	Page<T> findAllPaginated(Pageable pageable);
 	T add(@Valid T entity);
 	void update(ID id, @Valid T entity) throws EntityNotFoundException;
-	void delete(T entity);
-	void deleteById(ID id);
+	void delete(T entity) throws EntityNotFoundException;
+	void deleteById(ID id) throws EntityNotFoundException;
 }

@@ -83,7 +83,7 @@ public class CarRest extends ApiRest {
 	}
 
 	@DeleteMapping(value = "{id}")
-	public ResponseEntity<?> deleteCar(@PathVariable("id") long id) {
+	public ResponseEntity<?> deleteCar(@PathVariable("id") long id) throws EntityNotFoundException {
 		carService.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}

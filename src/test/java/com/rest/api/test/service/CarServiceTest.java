@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -13,12 +12,9 @@ import org.exparity.hamcrest.date.ZonedDateTimeMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.rest.api.data.CarRepository;
 import com.rest.api.exception.CarNotFoundException;
 import com.rest.api.model.Car;
 import com.rest.api.service.CarService;
@@ -29,9 +25,6 @@ public class CarServiceTest {
 
 	@Autowired
 	private CarService carService;
-	
-	//@MockBean
-	//private CarRepository carRepository;
 
 	@Test
 	public void getCar() throws Exception {
@@ -104,12 +97,12 @@ public class CarServiceTest {
 	}
 
 	@Test
-	public void deleteCar() {
+	public void deleteCar() throws Exception {
 		carService.deleteById(2L);
 	}
 	
-	@Test
-	public void deleteCarNotFound() {
+	@Test(expected = CarNotFoundException.class)
+	public void deleteCarNotFound() throws Exception {
 		carService.deleteById(99L);
 	}
 
@@ -139,7 +132,6 @@ public class CarServiceTest {
 				assertThat(new BigDecimal("25000.00"), equalTo(c.getPrice()));
 				break;
 			default:
-				fail();
 				break;
 			}
 		}
