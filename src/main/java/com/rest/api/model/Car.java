@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Car {
 	
 	@Id
-	@SequenceGenerator(name = "carIdSeq", sequenceName = "CAR_ID_SEQ")
+	@SequenceGenerator(name = "carIdSeq", sequenceName = "CAR_ID_SEQ", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "carIdSeq")
 	private long id;
 	
