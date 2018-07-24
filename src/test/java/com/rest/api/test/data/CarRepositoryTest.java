@@ -3,6 +3,7 @@ package com.rest.api.test.data;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 
@@ -88,7 +89,6 @@ public class CarRepositoryTest {
 	@Test
 	public void listCars() {
 		Iterable<Car> carList = carRepository.findAll();
-		//assertThat(3, equalTo(carList.size()));
 
 		for (Car c : carList) {
 			switch ((int) c.getId()) {
@@ -110,7 +110,20 @@ public class CarRepositoryTest {
 				assertThat(0, equalTo(c.getVersion()));
 				assertThat(new BigDecimal("25000.00"), equalTo(c.getPrice()));
 				break;
+			case 4:
+				assertThat("Fiat", equalTo(c.getBrand()));
+				assertThat("Punto", equalTo(c.getModel()));
+				assertThat(0, equalTo(c.getVersion()));
+				assertThat(new BigDecimal("10000.00"), equalTo(c.getPrice()));
+				break;
+			case 5:
+				assertThat("VW", equalTo(c.getBrand()));
+				assertThat("Polo", equalTo(c.getModel()));
+				assertThat(0, equalTo(c.getVersion()));
+				assertThat(new BigDecimal("16000.00"), equalTo(c.getPrice()));
+				break;
 			default:
+				fail();
 				break;
 			}
 		}

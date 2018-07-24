@@ -78,7 +78,7 @@ public class CarRest extends ApiRest {
 			throw new ResourceNotFoundException();
 		}
 		
-		eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<Car>
+		eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent
 		    (this, ServletUriComponentsBuilder.fromCurrentRequest(), response, resultPage.getTotalElements(), pageable.getPageNumber(), resultPage.getTotalPages(), pageable.getPageSize()));
 		   
 		return resultPage.getContent();

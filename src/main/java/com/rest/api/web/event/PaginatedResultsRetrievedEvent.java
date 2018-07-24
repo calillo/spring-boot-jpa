@@ -13,8 +13,11 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @param <T>
  *            Type of the result that is being handled (commonly Entities).
  */
-public final class PaginatedResultsRetrievedEvent<T> extends ApplicationEvent {
-    private final UriComponentsBuilder uriBuilder;
+public final class PaginatedResultsRetrievedEvent extends ApplicationEvent {
+
+	private static final long serialVersionUID = 1L;
+	
+	private final UriComponentsBuilder uriBuilder;
     private final HttpServletResponse response;
     private final long totalCount;
     private final int page;
