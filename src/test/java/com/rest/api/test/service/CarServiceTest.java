@@ -30,6 +30,8 @@ import com.rest.api.model.QCar;
 import com.rest.api.service.CarService;
 
 @RunWith(SpringRunner.class)
+// Loads a WebApplicationContext and provides a mock servlet environment
+// It will not start an embedded servlet container
 @SpringBootTest
 // reset database after test (like @DataJpaTest)
 @Transactional
