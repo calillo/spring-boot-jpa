@@ -1,9 +1,7 @@
-package com.rest.api.test.web;
+package com.rest.api.test.integration;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -18,11 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,9 +29,7 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.types.Predicate;
 import com.rest.api.model.Car;
-import com.rest.api.service.CarService;
 import com.rest.api.web.ApiRest;
 
 @RunWith(SpringRunner.class)
@@ -47,10 +39,10 @@ import com.rest.api.web.ApiRest;
 public class CarRestLevel3Test {
 	
 	private List<Car> carList = new ArrayList<>();
-	private Page<Car> carPage;
 	
     // This object will be magically initialized by the initFields method below.
     private JacksonTester<List<Car>> jsonCars;
+    private JacksonTester<Car> jsonCar;
     
     @Autowired
     private TestRestTemplate restTemplate;
@@ -69,9 +61,6 @@ public class CarRestLevel3Test {
     private OAuth2RestTemplate oauthTemplate;
     private HttpHeaders header = new HttpHeaders();
 	
-    @MockBean
-	private CarService carService;
-	
 	@Before
     public void setup() {
         // We would need this line if we would not use MockitoJUnitRunner
@@ -79,9 +68,12 @@ public class CarRestLevel3Test {
         // Initializes the JacksonTester
         JacksonTester.initFields(this, new ObjectMapper());
         
-        carList.add(new Car(1, "BMW", "320d", 0, new BigDecimal("40000.00"), ZonedDateTime.now(), ZonedDateTime.now()));
-        carList.add(new Car(2, "Audi", "A3 2.0 TDI", 0, new BigDecimal("35000.00"), ZonedDateTime.now(), ZonedDateTime.now()));     
-        carPage = new PageImpl<>(carList, PageRequest.of(0, 2), 5);
+        // same ad DB
+        carList.add(new Car(1, "BMW", "320d", 1, new BigDecimal("40000.00"), ZonedDateTime.now(), ZonedDateTime.now()));
+        carList.add(new Car(2, "Audi", "A3 2.0 TDI", 0, new BigDecimal("35000.00"), ZonedDateTime.now(), ZonedDateTime.now()));
+        carList.add(new Car(3, "Mercedes", "A 220d", 0, new BigDecimal("25000.00"), ZonedDateTime.now(), ZonedDateTime.now()));
+        carList.add(new Car(4, "Fiat", "Punto", 0, new BigDecimal("10000.00"), ZonedDateTime.now(), ZonedDateTime.now()));
+        carList.add(new Car(5, "VW", "Polo", 0, new BigDecimal("16000.00"), ZonedDateTime.now(), ZonedDateTime.now()));  
         
         // get oauth2 token
         oauthTemplate = getOAuth2RestTemplate();
@@ -112,16 +104,20 @@ public class CarRestLevel3Test {
 	}
 	
 	@Test
-	public void listCars2() throws Exception {
-		//given
-		//given(carService.findAll())
-		//		.willReturn(carList);
-		given(carService.findAllPaginated(any(Predicate.class), any(PageRequest.class)))
-				.willReturn(carPage);
-		
+	public void getCar() throws Exception {	
 		//when
 		ResponseEntity<String> response;
-		//response = restTemplate.getForEntity(ApiRest.API_PATH + "/cars", String.class);
+		response = restTemplate.exchange(ApiRest.API_PATH + "/cars/1", HttpMethod.GET, new HttpEntity<>(header), String.class);
+
+		//then
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+		assertThat(response.getBody(), equalTo(jsonCar.write(carList.get(0)).getJson()));		
+	}
+	
+	@Test
+	public void listCars2() throws Exception {		
+		//when
+		ResponseEntity<String> response;
 		response = restTemplate.exchange(ApiRest.API_PATH + "/cars", HttpMethod.GET, new HttpEntity<>(header), String.class);
 
 		//then
