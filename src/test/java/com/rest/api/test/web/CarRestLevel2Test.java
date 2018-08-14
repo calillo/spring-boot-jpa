@@ -47,6 +47,7 @@ import com.rest.api.web.CarRest;
 // @Component, @Service, @Repository, etc. will not be scanned when using this annotation
 @WebMvcTest(CarRest.class)
 // Configure QuerydslPredicateArgumentResolver and PageableHandlerMethodArgumentResolver
+
 @EnableSpringDataWebSupport
 public class CarRestLevel2Test {
 	
