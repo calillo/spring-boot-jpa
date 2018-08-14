@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,12 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -40,7 +44,10 @@ import com.rest.api.web.ApiRest;
 import com.rest.api.web.CarRest;
 
 @RunWith(SpringRunner.class)
+// @Component, @Service, @Repository, etc. will not be scanned when using this annotation
 @WebMvcTest(CarRest.class)
+// Configure QuerydslPredicateArgumentResolver and PageableHandlerMethodArgumentResolver
+@EnableSpringDataWebSupport
 public class CarRestLevel2Test {
 	
 	private List<Car> carList = new ArrayList<>();
@@ -48,12 +55,15 @@ public class CarRestLevel2Test {
 	
 	// This object will be magically initialized by the initFields method below.
     private JacksonTester<List<Car>> jsonCars;
+    private JacksonTester<Car> jsonCar;
 	
 	@Autowired
 	private MockMvc mockMvc;
 	
 	@MockBean
 	private CarService carService;
+	@MockBean
+	private ApplicationEventPublisher eventPublishere;
 	
 	@Before
     public void setup() {
@@ -65,7 +75,34 @@ public class CarRestLevel2Test {
         carList.add(new Car(1, "BMW", "320d", 0, new BigDecimal("40000.00"), ZonedDateTime.now(), ZonedDateTime.now()));
         carList.add(new Car(2, "Audi", "A3 2.0 TDI", 0, new BigDecimal("35000.00"), ZonedDateTime.now(), ZonedDateTime.now()));
         carPage = new PageImpl<>(carList, PageRequest.of(0, 2), 5);
-    }	
+    }
+	
+	@Test
+	@WithMockUser(authorities = {"CAR_READ"})
+	public void getCar() throws Exception {
+		//given
+		given(carService.findById(1L))
+			.willReturn(carList.get(1));
+		
+		//when
+		MockHttpServletResponse response;
+		response = mockMvc.perform(get(ApiRest.API_PATH + "/cars/1")).andReturn().getResponse();
+
+		//then
+		assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
+        assertThat(response.getContentAsString(), equalTo(jsonCar.write(carList.get(1)).getJson()));		
+	}
+	
+	@Test
+	@WithMockUser(authorities = {"CAR_READ"})
+	public void deleteCar() throws Exception {
+		//when
+		MockHttpServletResponse response;
+		response = mockMvc.perform(delete(ApiRest.API_PATH + "/cars/1")).andReturn().getResponse();
+
+		//then
+		assertThat(response.getStatus(), equalTo(HttpStatus.FORBIDDEN.value()));
+	}
 	
 	@Test
 	public void listCars() throws Exception {
