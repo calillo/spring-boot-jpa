@@ -105,10 +105,9 @@ public class CarRestLevel2Test {
 	}
 	
 	@Test
+	@WithMockUser(authorities = {"CAR_READ"})
 	public void listCars() throws Exception {
 		//given
-		//given(carService.findAll())
-		//		.willReturn(carList);
 		given(carService.findAllPaginated(any(Predicate.class), any(PageRequest.class)))
 				.willReturn(carPage);
 		
@@ -131,10 +130,9 @@ public class CarRestLevel2Test {
 	}
 	
 	@Test
+	@WithMockUser(authorities = {"CAR_READ"})
 	public void listCars2() throws Exception {
 		//given
-		//given(carService.findAll())
-		//		.willReturn(carList);
 		given(carService.findAllPaginated(any(Predicate.class), any(PageRequest.class)))
 				.willReturn(carPage);
 		//when
