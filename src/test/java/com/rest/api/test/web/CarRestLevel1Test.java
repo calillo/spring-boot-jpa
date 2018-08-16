@@ -44,7 +44,7 @@ import com.rest.api.model.Car;
 import com.rest.api.service.CarService;
 import com.rest.api.web.ApiRest;
 import com.rest.api.web.CarRest;
-import com.rest.api.web.ControllerAdvice;
+import com.rest.api.web.handler.ControllerAdvice;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CarRestLevel1Test {

@@ -1,11 +1,18 @@
 package com.rest.api.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
+import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.rest.api.web.ApiRest;
+import com.rest.api.web.handler.AuthenticationFailureHandler;
 
 @Configuration
 @EnableResourceServer
@@ -17,6 +24,29 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     		.antMatchers("/").permitAll()
     		.antMatchers(ApiRest.API_PATH + "/**").authenticated();
     }
+    
+    // catch oauth2exception and custom response set handler  
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+    	resources
+        	.accessDeniedHandler(accessDeniedHandler())
+        	.authenticationEntryPoint(authenticationEntryPoint());
+    }
+    
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        OAuth2AuthenticationEntryPoint authenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
+        authenticationEntryPoint.setExceptionTranslator(new AuthenticationFailureHandler());
+        return authenticationEntryPoint;
+    }
+    
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+    	OAuth2AccessDeniedHandler accessDeniedHandler = new OAuth2AccessDeniedHandler();
+    	accessDeniedHandler.setExceptionTranslator(new AuthenticationFailureHandler());
+        return accessDeniedHandler;
+    }
+    
     
     // JWT token
     // if use security.oauth2.resource.jwt.key-uri

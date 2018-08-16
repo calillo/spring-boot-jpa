@@ -1,4 +1,4 @@
-package com.rest.api.web;
+package com.rest.api.web.handler;
 
 import java.util.Locale;
 
@@ -39,10 +39,11 @@ public class ControllerAdvice {
 	}
 	
 	@ResponseBody
+	// TODO: generic for all properties exception
 	@ExceptionHandler(CarNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public Error handleCarNotFound(CarNotFoundException ex) {
-		return new Error(ex.getCode(), ex.getMessage());
+	public Error handleCarNotFound(CarNotFoundException ex, Locale locale) {
+		return new Error(ex.getCode(),  messageSource.getMessage(ex.getMessage(), null, locale));
 	}
 
 	@ResponseBody

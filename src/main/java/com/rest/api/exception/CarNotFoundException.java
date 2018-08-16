@@ -5,7 +5,6 @@ public class CarNotFoundException extends EntityNotFoundException {
 	private static final long serialVersionUID = 1L;
 
 	public CarNotFoundException() {
-		//TODO I18N CarNotFoundException message
-		super(1, "Car not found!");
+		super(1, "car.notfound");
 	}
 }
