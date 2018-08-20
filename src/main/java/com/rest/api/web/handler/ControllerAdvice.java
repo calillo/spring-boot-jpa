@@ -32,6 +32,11 @@ public class ControllerAdvice {
 	@Autowired
 	private MessageSource messageSource;
 	
+	public ControllerAdvice setMessageSource(MessageSource messageSource) {
+		this.messageSource = messageSource;
+		return this;
+	}
+	
 	@ExceptionHandler(ResourceNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public void handleResourceNotFoundException() {

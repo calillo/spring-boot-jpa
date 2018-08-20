@@ -45,7 +45,7 @@ public class CarServiceImpl implements CarService {
 		return carRepository.findAll(predicate, pageable);
 	}
 	
-	@PreAuthorize("hasAuthority('CAR_ADD')")
+	@PreAuthorize("hasAuthority('CAR_CREATE')")
 	public Car add(@Valid Car entity) {
 		entity.setInsertDate(ZonedDateTime.now());
 		entity.setUpdateDate(ZonedDateTime.now());

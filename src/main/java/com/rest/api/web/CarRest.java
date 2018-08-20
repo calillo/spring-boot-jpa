@@ -91,11 +91,11 @@ public class CarRest extends ApiRest {
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> addCar(@RequestBody Car car) {
-		carService.add(car);
+		Car carIns = carService.add(car);
 
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest().path("/{id}")
-				.buildAndExpand(car.getId())
+				.buildAndExpand(carIns.getId())
 				.toUri();
 		return ResponseEntity.created(location).build();
 	}
