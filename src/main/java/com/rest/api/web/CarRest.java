@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -48,7 +49,7 @@ public class CarRest extends ApiRest {
 	@Autowired
     private ApplicationEventPublisher eventPublisher;
 
-	//@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	//@GetMapping
 	//public Iterable<Car> listCars() {
 	//	return carService.findAll();
 	//}
@@ -65,7 +66,8 @@ public class CarRest extends ApiRest {
 	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
 	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
 	})
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping
+	@ResponseStatus(HttpStatus.OK)
 	public Iterable<Car> listCars(
 			@ApiIgnore @QuerydslPredicate(root = Car.class) Predicate predicate, 
 			@ApiIgnore Pageable  pageable,
@@ -84,12 +86,14 @@ public class CarRest extends ApiRest {
 		return resultPage.getContent();
 	}
 
-	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public Car getCar(@PathVariable("id") long id) throws EntityNotFoundException {
 		return carService.findById(id);
 	}
 
-	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<String> addCar(@RequestBody Car car) {
 		Car carIns = carService.add(car);
 
@@ -100,16 +104,16 @@ public class CarRest extends ApiRest {
 		return ResponseEntity.created(location).build();
 	}
 
-	@PutMapping(value = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> updateCar(@PathVariable("id") long id, @RequestBody Car car) throws EntityNotFoundException {
+	@PutMapping(value = "{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void updateCar(@PathVariable("id") long id, @RequestBody Car car) throws EntityNotFoundException {
 		carService.update(id, car);
-		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping(value = "{id}")
-	public ResponseEntity<?> deleteCar(@PathVariable("id") long id) throws EntityNotFoundException {
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteCar(@PathVariable("id") long id) throws EntityNotFoundException {
 		carService.deleteById(id);
-		return ResponseEntity.noContent().build();
 	}
 
 }
